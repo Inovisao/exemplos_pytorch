@@ -9,9 +9,10 @@ códigos para trabalhar com redes neurais profundas.
 
 ### Exemplo de uso:
 
-conda create -n pytorch
+- Obs: Verifique qual versão do cudatoolkit é compatível com a sua e troque se necessário.
+
+conda create -n pytorch -c conda-forge matplotlib pytorch torchvision tensorboard cudatoolkit=10.1
 conda activate pytorch
-conda install -c conda-forge matplotlib pytorch torchvision
 python exemplo_pytorch_v1.py
 
 
