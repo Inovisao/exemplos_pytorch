@@ -17,3 +17,12 @@ conda activate pytorch
 python exemplo_pytorch_v1.py
 ```
 
+Para rodar o segundo exemplo e depois analisar resultados com o tensorboard:
+
+```
+conda activate pytorch
+python exemplo_pytorch_v2.py
+tensorboard serve --logdir ./runs/
+Abrir em um navegador este link aqui: http://localhost:6006/
+```
+
