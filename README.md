@@ -11,10 +11,9 @@ códigos para trabalhar com redes neurais profundas.
 
 - Obs: Verifique qual versão do cudatoolkit é compatível com a sua e troque se necessário. Se a máquina não tiver GPU, NÃO tente instalar o cudatoolkit (retire ele do conda create)
 
+```
 conda create -n pytorch -c conda-forge matplotlib pytorch torchvision tensorboard cudatoolkit=10.1
-
 conda activate pytorch
-
 python exemplo_pytorch_v1.py
-
+```
 
