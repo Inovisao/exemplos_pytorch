@@ -25,16 +25,19 @@ from torch import nn  # Módulo para redes neurais (neural networks)
 from torch.utils.data import DataLoader # Manipulação de bancos de imagens
 from torchvision import datasets # Ajuda a importar alguns bancos já prontos e famosos
 from torchvision.transforms import ToTensor # Realiza transformações nas imagens
+import torchvision.transforms as transforms
 import matplotlib.pyplot as plt # Mostra imagens e gráficos
 from torch.utils.tensorboard import SummaryWriter
 import torchvision
 
 # Definindo alguns hiperparâmetros importantes:
-epocas = 50  # Total de passagens durante a aprendizagem pelo conjunto de imagens
+epocas = 100  # Total de passagens durante a aprendizagem pelo conjunto de imagens
 tamanho_lote = 64  # Tamanho de cada lote sobre o qual é calculado o gradiente
 taxa_aprendizagem = 0.001   # Magnitude das alterações nos pesos
 paciencia = 5  # Total de épocas sem melhoria da acurácia na validação até parar
 tolerancia = 0.01 # Melhoria menor que este valor não é considerada melhoria
+
+pasta_imagens_teste = "data/FashionMNIST_custom_testset/"
 
 # Definindo os dados para treinamento da rede neural
 # Utiliza uma base de imagens de roupas chamada FashionMNIST
@@ -78,15 +81,15 @@ print(f"Total de imagens de validação: {len(val_data)}")
 # um número)
 labels_map = {
      0: "Camiseta",
-     1: "Calças",
-     2: "pulôver",
+     1: "Calcas",
+     2: "Pulover",
      3: "Vestido",
      4: "Casaco",
-     5: "Sandália",
+     5: "Sandalia",
      6: "Camisa",
-     7: "Tênis",
+     7: "Tenis",
      8: "Bolsa",
-     9: "Bota de Tornozelo",    
+     9: "Bota_de_Tornozelo",    
 }
 
 figure = plt.figure(figsize=(8, 8))  # Cria o local para mostrar as imagens
@@ -262,9 +265,9 @@ for epoca in range(epocas):
 print("Terminou a fase de aprendizagem !")
 
 # Pega algumas imagens para o tensorboard
-#images, labels = next(iter(train_dataloader))
-#grid = torchvision.utils.make_grid(images)
-#writer.add_image('images', grid, 0)
+images, labels = next(iter(train_dataloader))
+grid = torchvision.utils.make_grid(images)
+writer.add_image('images', grid, 0)
 #writer.add_graph(model, images)
 writer.close()
 
@@ -295,7 +298,20 @@ print("Salvou o modelo treinado em modelo_treinado.pth")
 model = NeuralNetwork()
 model.load_state_dict(torch.load("modelo_treinado.pth"))
 
-"""## Usando a rede treinada para classificar imagens """
+"""## Usando a rede treinada para classificar imagens 
+
+Usando um conjunto de teste próprio que será lido do disco
+"""
+
+
+
+# Commented out IPython magic to ensure Python compatibility.
+# Vai baixar o banco de imagens de teste, colocar na pasta data e descompactar
+# %curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1Qx-VUrqO0S0OI8CojxVvEkA_JdpocTrE"
+# %mv Fash*.zip ./data/
+# %cd ./data/
+# %unzip Fash*.zip
+# %cd ..
 
 # Classifica uma única imagem 
 # model: rede a ser usada
@@ -310,19 +326,26 @@ def classifica_uma_imagem(model,x,y):
        print(f'Predita: "{predita}", Real: "{real}"')
     return(predita)
 
-# Vai mostrar a classificação da rede para 9 imagens escolhidas
-# aleatoriamente do conjunto de validação
+# Carrega o banco de imagens de teste aplicando as transformações
+# necessárias
+test_data = datasets.ImageFolder(root=pasta_imagens_teste,
+                                    transform=transforms.Compose(
+                                        [  transforms.Resize((28,28)),
+                                           transforms.Grayscale(num_output_channels=1),
+                                           transforms.ToTensor()
+                                        ])
+                                 )     
+
+# Vai mostrar a classificação da rede para 16 imagens do conjunto de teste
 figure = plt.figure(figsize=(8, 8))  # Cria o local para mostrar as imagens
-cols, rows = 3, 3  # Irá mostrar 9 imagens em uma grade 3x3
-for i in range(1, cols * rows + 1):
-    # Gera um número aleatório menor que o total de imagens disponíveis
-    sample_idx = torch.randint(len(val_data), size=(1,)).item()
-    # Pega a imagem e sua classe usando o número aleatório
-    img, label = val_data[sample_idx]
+cols, rows = 4, 4  # Irá mostrar 16 imagens em uma grade 4x4
+print(f"Testando em {len(test_data)} imagens. Resultados:")
+for i in range(len(test_data)):
+    img, label = test_data[i]
     # Classifica a imagem usando a rede treinada
     predita = classifica_uma_imagem(model,img,label)
     # Adiciona a imagem na grade que será mostrada
-    figure.add_subplot(rows, cols, i)
+    figure.add_subplot(rows, cols, i+1)
     # Usa a classe da imagem como título da imagem
     plt.title(predita)
     # Não mostra valores para os eixos X e Y
