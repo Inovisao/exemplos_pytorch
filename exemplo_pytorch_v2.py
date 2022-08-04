@@ -29,6 +29,14 @@ import torchvision.transforms as transforms
 import matplotlib.pyplot as plt # Mostra imagens e gráficos
 from torch.utils.tensorboard import SummaryWriter
 import torchvision
+import PIL
+import sklearn.metrics as metrics
+from sklearn.metrics import precision_recall_fscore_support as score
+import seaborn as sn
+import pandas as pd
+import numpy as np
+from IPython.display import Image, display
+
 
 # Definindo alguns hiperparâmetros importantes:
 epocas = 100  # Total de passagens durante a aprendizagem pelo conjunto de imagens
@@ -89,7 +97,7 @@ labels_map = {
      6: "Camisa",
      7: "Tenis",
      8: "Bolsa",
-     9: "Bota_de_Tornozelo",    
+     9: "Bota",    
 }
 
 figure = plt.figure(figsize=(8, 8))  # Cria o local para mostrar as imagens
@@ -298,19 +306,19 @@ print("Salvou o modelo treinado em modelo_treinado.pth")
 model = NeuralNetwork()
 model.load_state_dict(torch.load("modelo_treinado.pth"))
 
-"""## Usando a rede treinada para classificar imagens 
+"""## Usando a rede treinada para classificar algumas imagens 
 
-Usando um conjunto de teste próprio que será lido do disco
+Usando um conjunto de teste próprio que será lido do disco. As imagens são um pouco diferentes do conjunto usado para treinamento da rede e por isso e desempenho cai bastante. 
 """
 
 
 
 # Commented out IPython magic to ensure Python compatibility.
 # Vai baixar o banco de imagens de teste, colocar na pasta data e descompactar
-# %curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1Qx-VUrqO0S0OI8CojxVvEkA_JdpocTrE"
-# %mv Fash*.zip ./data/
+#!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1Qx-VUrqO0S0OI8CojxVvEkA_JdpocTrE"
+#!mv Fash*.zip ./data/
 # %cd ./data/
-# %unzip Fash*.zip
+#!unzip Fash*.zip
 # %cd ..
 
 # Classifica uma única imagem 
@@ -326,21 +334,28 @@ def classifica_uma_imagem(model,x,y):
        print(f'Predita: "{predita}", Real: "{real}"')
     return(predita)
 
+# Cria uma transformação nova que não está disponível diretamente para
+# composição de transformação 
+def invert(image: PIL.Image.Image) -> PIL.Image.Image:
+    return transforms.functional.invert(image)
+
+
 # Carrega o banco de imagens de teste aplicando as transformações
 # necessárias
 test_data = datasets.ImageFolder(root=pasta_imagens_teste,
                                     transform=transforms.Compose(
                                         [  transforms.Resize((28,28)),
                                            transforms.Grayscale(num_output_channels=1),
-                                           transforms.ToTensor()
+                                           transforms.Lambda(invert),
+                                           transforms.ToTensor(),
                                         ])
-                                 )     
+                                 ) 
 
 # Vai mostrar a classificação da rede para 16 imagens do conjunto de teste
 figure = plt.figure(figsize=(8, 8))  # Cria o local para mostrar as imagens
 cols, rows = 4, 4  # Irá mostrar 16 imagens em uma grade 4x4
 print(f"Testando em {len(test_data)} imagens. Resultados:")
-for i in range(len(test_data)):
+for i in range(cols*rows):
     img, label = test_data[i]
     # Classifica a imagem usando a rede treinada
     predita = classifica_uma_imagem(model,img,label)
@@ -355,3 +370,52 @@ for i in range(len(test_data)):
     plt.imshow(img.squeeze(), cmap="gray")
     
 plt.show() # Este é o comando que vai mostrar as imagens
+
+"""## Gera matriz de confusão e algumas métricas de avaliação"""
+
+# Listas para guardar valores preditos e reais
+predicoes = []
+reais = []
+
+# Vai acumular acertos para calcular acurácia
+test_correct=0
+
+model.eval() # Coloca a rede no modo de avaliação (e não de aprendizagem)
+with torch.no_grad():   # Avisa que não devem ser calculados gradientes
+   for img, label in test_data:   # Para cada imagem do conjunto de teste
+      predicao = model(img)       # Faz a predição usando a rede
+      predicao = int(predicao[0].argmax(0))  # Pega a classe com maior valor
+      predicoes.extend([predicao]) # Guarda predição na lista
+      reais.extend([label])        # Guarda valor real na lista
+      test_correct += (predicao == label)
+
+# Acurácia no conjunto de teste
+test_acuracia = test_correct/len(test_data)
+
+# Constroi a matriz de confusão
+matriz = metrics.confusion_matrix(reais,predicoes)
+
+# Pega a lista de classes 
+classes=list(labels_map.values())
+
+# Transforma a matriz no formato da biblioteca PANDA
+df_matriz = pd.DataFrame(matriz/np.sum(matriz) * len(labels_map), index = classes,
+                     columns = [i for i in classes])
+
+# Gera uma imagem do tipo mapa de calor
+plt.figure(figsize = (12,7))
+sn.heatmap(df_matriz, annot=True)
+plt.savefig('matriz_confusao.png')
+
+print('Métricas de desempenho no conjunto de teste:')
+print(metrics.classification_report(reais,predicoes))
+
+precision,recall,fscore,support=score(reais,predicoes,average='macro')
+print('-----------------------------------')
+print(f'Resumo para as {len(test_data)} imagens de teste:')
+print(f"Acertos: {int(test_correct)}")
+print(f"Acurácia: {(100*test_acuracia):>0.2f}%")
+print(f"Precisão: {100*precision:>0.2f}%")
+print(f"Revocação: {100*recall:>0.2f}%")
+print(f"Medida-F: {100*fscore:>0.2f}%")
+print('-----------------------------------')
