@@ -1,0 +1,6 @@
+data/FashionMNIST/
+data/FashionMNIST_custom_testset/
+modelo_treinado.pth
+matriz_confusao.png
+runs/
+
