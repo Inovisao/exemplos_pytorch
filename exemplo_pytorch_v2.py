@@ -35,7 +35,6 @@ from sklearn.metrics import precision_recall_fscore_support as score
 import seaborn as sn
 import pandas as pd
 import numpy as np
-from IPython.display import Image, display
 
 
 # Definindo alguns hiperparâmetros importantes:
