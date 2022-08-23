@@ -13,6 +13,11 @@ Mudanças nesta versão:
 - Lendo os dados do google drive seguindo a mesma estrutura
   do compara_classificadores_tf2:
   http://git.inovisao.ucdb.br/inovisao/compara_classificadores_tf2
+- Separa percentual para validação
+- Mostra grafo da rede e lote de imagens no tensorboard
+- Testa se está rodando em um notebook jupyter antes de
+  realizar operação que só funcionam no notebook (facilita
+  para rodar tanto no notebook quanto em um desktop)
 
 ## Carregando um banco de imagens
 """
@@ -81,7 +86,8 @@ tamanho_imagens = 224  # Tamanho das imagens para estas arquiteturas
 
 # Define as transformações nas imagens 
 transform = transforms.Compose([transforms.Resize((tamanho_imagens,tamanho_imagens)),
-                                transforms.ToTensor()
+                                transforms.ToTensor(),
+                                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))                                
                                ])    
 # Prepara banco de imagens de treino (está junto com validação por enquanto)
 training_val_data = datasets.ImageFolder(root=pasta_treino,transform=transform)
