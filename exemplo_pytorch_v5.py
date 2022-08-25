@@ -38,9 +38,9 @@ import numpy as np    # Várias funções numéricas
 import torchvision.models.segmentation # Redes famosas para segmentação semântica
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt # Mostra imagens e gráficos
-#from torch.utils.tensorboard import SummaryWriter # Salva "log" da aprendizagem
+from torch.utils.tensorboard import SummaryWriter # Salva "log" da aprendizagem
 import torchvision
-from PIL import Image
+from PIL import Image,ImageOps
 import torch.utils.data as data
 import sklearn.metrics as metrics  # Ajuda a calcular métricas de desempenho
 from sklearn.metrics import precision_recall_fscore_support as score
@@ -63,9 +63,12 @@ perc_teste = 0.2  # Percentual a ser usado para teste
 perc_val = 0.3    # Percentual do treinamento a ser usado para validação
 
 # Define uma arquitetura já conhecida que será usada
-# Opções atuais: "deeplabv3"
-nome_rede = "deeplabv3"
-tamanho_imagens = 900  # Tamanho das imagem para a arquitetura escolhida
+# Opções atuais: "deeplabv3","fcn" 
+nome_rede = "fcn"
+tamanho_imagens = 500  # Tamanho das imagem para a arquitetura escolhida
+
+# Lista de classes 
+classes=['fundo','cascavel']
 
 # Cria uma função para saber se estamos rodando de dentro de um notebook
 # jupyter 
@@ -86,7 +89,7 @@ if in_notebook():
    from google.colab import drive
    drive.mount('/content/drive')
 
-# Ajusta nome das pastas onde estão todas as imagens
+# Ajusta nome das pastas onde estão todas as imagens e anotações
 if in_notebook(): pasta_data = "/content/drive/MyDrive/compara_segmentadores/data/"
 else: pasta_data = "./data/"  
 print("Vai ler as imagens de: ",pasta_data)
@@ -104,6 +107,11 @@ def ImagemAleatoria(pasta,nomes):
     
     # Lê a imagem usando o índice aleatório
     imagem=Image.open(os.path.join(pasta, "imagens", nomes[idx]))
+
+    # Aplica operações para resolver problema de orientação
+    # de imagens com tag de orientação EXIF
+    imagem = ImageOps.exif_transpose(imagem)
+
     # Lê a anotação usando o índice aleatório. 
     # Assume que as anotações são do tipo png
     arquivo_anotacao=os.path.splitext(nomes[idx])[0]+'.png'  
@@ -115,6 +123,7 @@ def ImagemAleatoria(pasta,nomes):
     # Dependendo do tipo do arquivo de anotação pode ser preciso mudar
     # o teste "anotacao > 0". Tem que dar uma inspecionada nos valores dos pixels
     anotacao=torch.where(anotacao > 0, 1, 0)
+
     return imagem,anotacao
 
 # Lê um lote de imagens
@@ -159,12 +168,14 @@ print(f"Total de imagens de treinamento: {len(nomes_treino)} ({100*len(nomes_tre
 print(f"Total de imagens de validação: {len(nomes_val)} ({100*len(nomes_val)/total_imagens:>2f}%)")
 print(f"Total de imagens de teste: {len(nomes_teste)} ({100*len(nomes_teste)/total_imagens:>2f}%)")
 
+print('Classes: ',classes,'Total = ',len(classes))
+
 """### Mostrando algumas imagens"""
 
 figure = plt.figure(figsize=(10, 5))  # Cria o local para mostrar as imagens
 # Não mostra valores para os eixos X e Y
 plt.axis("off")
-cols, rows = 4, 1  # Irá mostrar 2 imagens com suas anotações em uma grade 4x1
+cols, rows = 4, 2  # Irá mostrar 2 imagens com suas anotações em uma grade 4x1
 
 # Carrega um lote de imagens e de anotações de treino
 X,y = LoteDeImagens(pasta_data,nomes_treino,tamanho_lote)
@@ -179,10 +190,10 @@ for i in range(0,len(X)):
     # Tem que ajustar a ordem das dimensões do tensor para que os canais
     # fiquem na última dimensão (e não ma primeira)
     figure.add_subplot(rows, cols, i*2+1)
-    plt.imshow(imagem.permute(1,2,0),origin='upper')
+    plt.imshow(imagem.permute(1,2,0),origin='lower')
     # Adiciona anotação ao lado da imagem
     figure.add_subplot(rows, cols, i*2+2)
-    plt.imshow(anotacao.squeeze().numpy(),cmap='gray',origin='upper')
+    plt.imshow(anotacao.squeeze().numpy(),cmap='gray',origin='lower')
     
 plt.show() # Este é o comando que vai mostrar as imagens
 
@@ -199,11 +210,11 @@ print(f"Usando {device}")
 if nome_rede == "deeplabv3":
    model = torchvision.models.segmentation.deeplabv3_resnet50(pretrained=True)
    # Muda a camada final para um problema com 2 classes
-   model.classifier[4] = torch.nn.Conv2d(256, 2, kernel_size=(1, 1), stride=(1, 1)) 
+   model.classifier[4] = torch.nn.Conv2d(256, len(classes), kernel_size=(1, 1), stride=(1, 1)) 
 elif nome_rede == "fcn":
    model = torchvision.models.segmentation.fcn_resnet50(pretrained=True)
-   # MUDAR A LINHA DE BAIXO ... SÓ COPIEI DA DEEPLABV3 MAS NÃO DEVE SER IGUAL
-   model.classifier[4] = torch.nn.Conv2d(256, 2, kernel_size=(1, 1), stride=(1, 1)) 
+   model.classifier[4] = torch.nn.Conv2d(512, len(classes), kernel_size=(1, 1), stride=(1, 1)) 
+   #model = torchvision.models.segmentation.fcn_resnet50(pretrained=True, num_classes=len(classes))
         
 
 # Prepara a rede para o dispositivo que irá processá-la
@@ -221,7 +232,7 @@ otimizador = torch.optim.Adam(model.parameters(), lr=taxa_aprendizagem)
 funcao_perda = nn.CrossEntropyLoss()
 
 # Cria o módulo do tensorboard de coleta de dados
-#writer = SummaryWriter()
+writer = SummaryWriter()
 
 # Define a função para treinar a rede
 # dataloader = módulo que manipula o conjunto de imagens
@@ -324,8 +335,8 @@ for epoca in range(epocas):
     val_loss, val_acuracia = validation(pasta_data,nomes_val, model, funcao_perda)
 
     # Guarda informações para o tensorboard pode criar os gráficos depois
-    #writer.add_scalars('Loss', {'train':train_loss,'val':val_loss}, epoca)
-    #writer.add_scalars('Accuracy', {'train':train_acuracia,'val':val_acuracia}, epoca)
+    writer.add_scalars('Loss', {'train':train_loss,'val':val_loss}, epoca)
+    writer.add_scalars('Accuracy', {'train':train_acuracia,'val':val_acuracia}, epoca)
 
     # Soma uma tolerancia no valor da maior acurácia para que melhoras muito
     # pequenas não sejam consideradas
@@ -352,7 +363,7 @@ print("Terminou a fase de aprendizagem !")
 # img_grid = torchvision.utils.make_grid(images)
 # writer.add_image('Minhas Imagens', img_grid)
 # writer.add_graph(model, images)
-#writer.close()
+writer.close()
 
 """## Visualização usando Tensorboard
 
@@ -389,7 +400,7 @@ def classifica_uma_imagem(model,x):
 figure = plt.figure(figsize=(12, 8))  # Cria o local para mostrar as imagens
 # Não mostra valores para os eixos X e Y
 plt.axis("off")
-cols, rows = 4, 2  # Irá mostrar imagens com suas anotações em uma grade 4x2
+cols, rows = 4, 4  # Irá mostrar imagens com suas anotações em uma grade 4x2
 
 # Carrega um lote de imagens e de anotações de treino
 X,y = LoteDeImagens(pasta_data,nomes_teste,tamanho_lote)
@@ -458,9 +469,6 @@ test_acuracia = test_correct/pixels
 
 # Constroi a matriz de confusão
 matriz = metrics.confusion_matrix(reais,predicoes)
-
-# Lista de classes 
-classes=['fundo','vinhedo']
 
 # Normaliza a matriz para o intervalo 0 e 1 e arredonda em 2 casas decimais 
 # cada célula
