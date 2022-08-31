@@ -10,7 +10,7 @@ Original file is located at
 
 Mudanças nesta versão:
 
-- Lendo os dados de uma pasta no google drive, separados entre traino (train) e teste (test). Dentro de cada pasta (train,teste) as imagens devem estar separadas em subpastas, uma para cada classe.
+- Lendo os dados de uma pasta no google drive, separados entre treino (train) e teste (test). Dentro de cada pasta (train,teste) as imagens devem estar separadas em subpastas, uma para cada classe.
 - Separa percentual para validação
 - Mostra grafo da rede e lote de imagens no tensorboard
 - Testa se está rodando em um notebook jupyter antes de
@@ -19,6 +19,8 @@ Mudanças nesta versão:
 
 ### Carregando um banco de imagens
 Usa como exemplo imagens disponíveis na pasta 'data' deste projeto aqui: http://git.inovisao.ucdb.br/inovisao/exemplos_pytorch
+
+Dentro de exemplos_pytorch, na pasta data, tem um script BASH (Linux) chamado split_train_test.sh para separar as suas imagens em treino e teste (dentro de script tem uma explicação de como usá-lo). É preciso usar o terminal Linux para executá-lo.
 """
 
 import torch   # Biblioteca pytorch principal
