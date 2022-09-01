@@ -34,8 +34,8 @@ Alguns dos exemplos exigem dados próprios. Para estes casos (do exemplo v4 em d
 Links para rodar no Google Colab (faça um cópia para o seu drive se quiser
 fazer alterações e salvar)
 
--[exemplo_pytorch_v1](https://colab.research.google.com/drive/1sJJgfc_2wLvvZWwhz2Ea8oWUxS9IcORu)
--[exemplo_pytorch_v2](https://colab.research.google.com/drive/1eqZbgFoN2GLNFBreSx1Rp7DmU6b3Di7E)
+..*[exemplo_pytorch_v1](https://colab.research.google.com/drive/1sJJgfc_2wLvvZWwhz2Ea8oWUxS9IcORu)
+..*[exemplo_pytorch_v2](https://colab.research.google.com/drive/1eqZbgFoN2GLNFBreSx1Rp7DmU6b3Di7E)
 -[exemplo_pytorch_v3](https://colab.research.google.com/drive/1-GMeHTbbz4MqqUDOMPkd2cLT0rMIBU8k)
 -[exemplo_pytorch_v4](https://colab.research.google.com/drive/1egrQOlXvi_rvX2ZtfvK56wVXMyIp6GCh)
 -[exemplo_pytorch_v5](https://colab.research.google.com/drive/1XXegdU79g7HuNvtlSkDzrcbdL67Y-g9q)
