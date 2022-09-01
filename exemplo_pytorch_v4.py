@@ -10,16 +10,17 @@ Original file is located at
 
 Mudanças nesta versão:
 
-- Lendo os dados do google drive seguindo a mesma estrutura
-  do compara_classificadores_tf2:
-  http://git.inovisao.ucdb.br/inovisao/compara_classificadores_tf2
+- Lendo os dados de uma pasta no google drive, separados entre treino (train) e teste (test). Dentro de cada pasta (train,teste) as imagens devem estar separadas em subpastas, uma para cada classe.
 - Separa percentual para validação
 - Mostra grafo da rede e lote de imagens no tensorboard
 - Testa se está rodando em um notebook jupyter antes de
   realizar operação que só funcionam no notebook (facilita
   para rodar tanto no notebook quanto em um desktop)
 
-## Carregando um banco de imagens
+### Carregando um banco de imagens
+Usa como exemplo imagens disponíveis na pasta 'data' deste projeto aqui: http://git.inovisao.ucdb.br/inovisao/exemplos_pytorch
+
+Dentro de exemplos_pytorch, na pasta data, tem um script BASH (Linux) chamado split_train_test.sh para separar as suas imagens em treino e teste (dentro de script tem uma explicação de como usá-lo). É preciso usar o terminal Linux para executá-lo.
 """
 
 import torch   # Biblioteca pytorch principal
@@ -41,14 +42,20 @@ import pandas as pd   # Ajuda a trabalhar com tabelas
 import numpy as np    # Várias funções numéricas
 
 # Definindo alguns hiperparâmetros importantes:
-epocas = 50  # Total de passagens durante a aprendizagem pelo conjunto de imagens
-tamanho_lote = 64  # Tamanho de cada lote sobre o qual é calculado o gradiente
-taxa_aprendizagem = 0.001   # Magnitude das alterações nos pesos
-momento = 0.9  # Mantem informação de pesos anteriores (as mudanças de
+epocas = 100  # Total de passagens durante a aprendizagem pelo conjunto de imagens
+tamanho_lote = 16  # Tamanho de cada lote sobre o qual é calculado o gradiente
+taxa_aprendizagem = 0.01   # Magnitude das alterações nos pesos
+momento = 0.2  # Mantem informação de pesos anteriores (as mudanças de
                # de peso passam a ser mais suaves)
 paciencia = 5  # Total de épocas sem melhoria da acurácia na validação até parar
 tolerancia = 0.01 # Melhoria menor que este valor não é considerada melhoria
-perc_val = 0.3    # Percentual do treinamento a ser usado para validação
+perc_val = 0.2    # Percentual do treinamento a ser usado para validação
+
+# Define uma arquitetura já conhecida que será usada
+# Opções atuais: "resnet", "squeezenet", "densenet"
+nome_rede = "resnet"
+tamanho_imagens = 224  # Tamanho das imagens para estas arquiteturas
+
 
 # Cria uma função para saber se estamos rodando de dentro de um notebook
 # jupyter 
@@ -74,20 +81,19 @@ if in_notebook():
 # imagens de treino (como fazemos em compara_classificadores_tf2)
 pasta_base = "../../"  # No desktop o programa estará na pasta "src"
 if in_notebook(): pasta_base = "/content/drive/MyDrive/"
-pasta_data = pasta_base+"compara_classificadores_tf2/data/"
+pasta_data = pasta_base+"data/"
 print("Vai ler as imagens de: ",pasta_data)
 pasta_treino = pasta_data+"train"
 pasta_teste  = pasta_data+"test"
 
-# Define uma arquitetura já conhecida que será usada
-# Opções atuais: "resnet", "squeezenet", "densenet"
-nome_rede = "resnet"
-tamanho_imagens = 224  # Tamanho das imagens para estas arquiteturas
-
-# Define as transformações nas imagens 
+# Define as transformações nas imagens: 
+# Muda tamanho, transforma em tensor e normaliza usando os valores
+# calculados sobre a base ImageNet (por conta da transferência de aprendizagem)
+#
+# Nem sempre a normalização dá melhores resultados. Descomente a linha se quiser usar.
 transform = transforms.Compose([transforms.Resize((tamanho_imagens,tamanho_imagens)),
                                 transforms.ToTensor(),
-                                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))                                
+                                #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
                                ])    
 # Prepara banco de imagens de treino (está junto com validação por enquanto)
 training_val_data = datasets.ImageFolder(root=pasta_treino,transform=transform)
@@ -102,8 +108,8 @@ val_data = Subset(training_val_data, val_idx)
 
 # Cria os objetos que irão manipular os dados (basicamente ajuda a pegar
 # lote (batch) de imagens de treinamento e de validação)
-train_dataloader = DataLoader(training_data, batch_size=tamanho_lote)
-val_dataloader = DataLoader(val_data, batch_size=tamanho_lote)
+train_dataloader = DataLoader(training_data, batch_size=tamanho_lote,shuffle=True)
+val_dataloader = DataLoader(val_data, batch_size=tamanho_lote,shuffle=True)
 
 # Mostra informações do primeiro lote de imagens de validação 
 # X vai conter um lote de imagens
@@ -117,9 +123,11 @@ for X, y in val_dataloader:
     print(f"Tipo de cada classe: {y.dtype}")
     break  # Para depois de mostrar os dados do primeiro lote
 
-print(f"Total de imagens de treinamento: {len(training_data)}")
-print(f"Total de imagens de validação: {len(val_data)}")
-print(f"Total de imagens de teste: {len(test_data)}")
+total_imagens=len(training_data)+len(val_data)+len(test_data)
+print(f"Total de imagens: {total_imagens}")
+print(f"Total de imagens de treinamento: {len(training_data)} ({100*len(training_data)/total_imagens:>2f}%)")
+print(f"Total de imagens de validação: {len(val_data)} ({100*len(val_data)/total_imagens:>2f}%)")
+print(f"Total de imagens de teste: {len(test_data)} ({100*len(test_data)/total_imagens:>2f}%)")
 labels_map = {v: k for k, v in test_data.class_to_idx.items()}
 print('\nClasses:',labels_map)
 
@@ -204,20 +212,21 @@ def train(dataloader, model, loss_fn, optimizer):
         pred = model(X)         # Realiza uma previsão usando os pesos atuais
         loss = loss_fn(pred, y) # Calcula o erro com os pesos atuais
 
-        train_loss += loss_fn(pred, y).item() # Guarda para calcular a perda média
+        train_loss += loss.item() # Guarda para calcular a perda média
         # Calcula os acertos para o lote inteiro de imagens
         train_correct += (pred.argmax(1) == y).type(torch.float).sum().item() 
 
-        optimizer.zero_grad()  # Zera os gradientes pois vai acumular para todas
-                               # as imagens do lote
+
         loss.backward()        # Calcula os gradientes com base no erro (loss)
         optimizer.step()       # Ajusta os pesos com base nos gradientes
+        optimizer.zero_grad()  # Zera os gradientes pois vai acumular para todas
+                               # as imagens do lote
 
-        # Imprime informação a cada 100 lotes processados 
-        if batch % 100 == 0:
+        # Imprime informação a cada 4 lotes processados 
+        if batch % 4 == 0:
             # Mostra a perda e o total de imagens já processadas
             loss, current = loss.item(), batch * len(X)
-            print(f"Perda: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            print(f"Perda Treino: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
     train_loss /= num_batches  # Como a perda foi calculada por lote, divide
                                # pelo total de lotes para calcular a média
@@ -278,6 +287,9 @@ for epoca in range(epocas):
     # Soma uma tolerancia no valor da maior acurácia para que melhoras muito
     # pequenas não sejam consideradas
     if val_acuracia > (maior_acuracia+tolerancia): 
+      # Salva a melhor rede encontrada até o momento
+      torch.save(model.state_dict(), "modelo_treinado_"+nome_rede+".pth")
+      print("Salvou o modelo com a maior acurácia na validação até agora em modelo_treinado_"+nome_rede+".pth")      
       maior_acuracia = val_acuracia
       total_sem_melhora = 0
     else: 
@@ -307,23 +319,12 @@ writer.close()
 # %load_ext tensorboard
 # %tensorboard --logdir=runs
 
-"""# Salvando a rede treinada
-
-
-"""
-
-# Salva em disco os pesos da rede treinada para ser usada
-# posteriormente (sem precisar aprender novamente)
-
-torch.save(model.state_dict(), "modelo_treinado.pth")
-print("Salvou o modelo treinado em modelo_treinado.pth")
-
 """## Carregando a rede treinada anteriormente e usando
 
 
 """
 
-model.load_state_dict(torch.load("modelo_treinado.pth"))
+model.load_state_dict(torch.load("modelo_treinado_"+nome_rede+".pth"))
 
 """## Usando a rede treinada para classificar algumas imagens """
 
@@ -345,7 +346,9 @@ figure = plt.figure(figsize=(8, 8))  # Cria o local para mostrar as imagens
 cols, rows = 4, 4  # Irá mostrar 16 imagens em uma grade 4x4
 print(f"Testando em {len(test_data)} imagens. Resultados:")
 for i in range(cols*rows):
-    img, label = test_data[i]
+    aleatoria = torch.randint(len(test_data), size=(1,)).item()
+    img, label = test_data[aleatoria]
+
     img = img.unsqueeze(0).to(device)
 
     # Classifica a imagem usando a rede treinada
@@ -393,8 +396,11 @@ matriz = metrics.confusion_matrix(reais,predicoes)
 # Pega a lista de classes 
 classes=list(labels_map.values())
 
+# Normaliza a matriz para o intervalo 0 e 1 e arredonda em 2 casas decimais 
+# cada célula
+matriz_normalizada = np.round(matriz/np.sum(matriz) * len(labels_map),2)
 # Transforma a matriz no formato da biblioteca PANDA
-df_matriz = pd.DataFrame(matriz/np.sum(matriz) * len(labels_map), index = classes,
+df_matriz = pd.DataFrame(matriz_normalizada, index = classes,
                      columns = [i for i in classes])
 
 # Gera uma imagem do tipo mapa de calor
