@@ -39,6 +39,6 @@ fazer alterações e salvar)
 * [exemplo_pytorch_v3](https://colab.research.google.com/drive/1-GMeHTbbz4MqqUDOMPkd2cLT0rMIBU8k) Uso de redes famosas, transferência de aprendizado e ajuste fino.
 * [exemplo_pytorch_v4](https://colab.research.google.com/drive/1egrQOlXvi_rvX2ZtfvK56wVXMyIp6GCh) Classificação usando seus próprios dados
 * [exemplo_pytorch_v5](https://colab.research.google.com/drive/1XXegdU79g7HuNvtlSkDzrcbdL67Y-g9q) Segmentação de imagens usando seus próprios dados
-* [exemplo_pytorch_v6](https://colab.research.google.com/drive/1YNMPsOhR2PV-DDexVmgo8Fb6mVbTMga6) Detecção de objetos usando seus próprios dados
+* [exemplo_pytorch_v6](https://colab.research.google.com/drive/1YNMPsOhR2PV-DDexVmgo8Fb6mVbTMga6) Detecção de objetos usando seus próprios dados, uso de aumento de dados.
 
 
