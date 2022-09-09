@@ -20,7 +20,7 @@ Mudanças nesta versão:
 ### Carregando um banco de imagens
 Usa como exemplo imagens disponíveis na pasta 'data' deste projeto aqui: http://git.inovisao.ucdb.br/inovisao/exemplos_pytorch
 
-Dentro de exemplos_pytorch, na pasta data, tem um script BASH (Linux) chamado split_train_test.sh para separar as suas imagens em treino e teste (dentro de script tem uma explicação de como usá-lo). É preciso usar o terminal Linux para executá-lo.
+Dentro de exemplos_pytorch, na pasta data, tem um script BASH (Linux) chamado split_train_test.sh para separar as suas imagens em treino e teste (dentro de script tem uma explicação de como usá-lo). É preciso usar o terminal Linux para executá-lo. Use chmod 755 ./split*.sh para transformar o script em executável, se necessário.
 """
 
 import torch   # Biblioteca pytorch principal
@@ -288,8 +288,8 @@ for epoca in range(epocas):
     # pequenas não sejam consideradas
     if val_acuracia > (maior_acuracia+tolerancia): 
       # Salva a melhor rede encontrada até o momento
-      torch.save(model.state_dict(), "modelo_treinado_"+nome_rede+".pth")
-      print("Salvou o modelo com a maior acurácia na validação até agora em modelo_treinado_"+nome_rede+".pth")      
+      torch.save(model.state_dict(), pasta_data+"modelo_treinado_"+nome_rede+".pth")
+      print("Salvou o modelo com a maior acurácia na validação até agora em "+pasta_data+"modelo_treinado_"+nome_rede+".pth")      
       maior_acuracia = val_acuracia
       total_sem_melhora = 0
     else: 
@@ -324,7 +324,7 @@ writer.close()
 
 """
 
-model.load_state_dict(torch.load("modelo_treinado_"+nome_rede+".pth"))
+model.load_state_dict(torch.load(pasta_data+"modelo_treinado_"+nome_rede+".pth"))
 
 """## Usando a rede treinada para classificar algumas imagens """
 
@@ -398,7 +398,7 @@ classes=list(labels_map.values())
 
 # Normaliza a matriz para o intervalo 0 e 1 e arredonda em 2 casas decimais 
 # cada célula
-matriz_normalizada = np.round(matriz/np.sum(matriz) * len(labels_map),2)
+matriz_normalizada = np.round(matriz/np.sum(matriz),2)
 # Transforma a matriz no formato da biblioteca PANDA
 df_matriz = pd.DataFrame(matriz_normalizada, index = classes,
                      columns = [i for i in classes])

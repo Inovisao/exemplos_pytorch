@@ -38,7 +38,7 @@ tamanho_lote = 64  # Tamanho de cada lote sobre o qual é calculado o gradiente
 taxa_aprendizagem = 0.001   # Magnitude das alterações nos pesos
 momento = 0.9  # Mantem informação de pesos anteriores (as mudanças de
                # de peso passam a ser mais suaves)
-paciencia = 5  # Total de épocas sem melhoria da acurácia na validação até parar
+paciencia = 3  # Total de épocas sem melhoria da acurácia na validação até parar
 tolerancia = 0.01 # Melhoria menor que este valor não é considerada melhoria
 
 # As imagens de teste, que eu peguei da Internet e não estão nem no conjunto
@@ -47,10 +47,9 @@ pasta_imagens_teste = "data/FashionMNIST_custom_testset/"
 
 # Define uma arquitetura já conhecida que será usada
 # Opções atuais: "resnet", "squeezenet", "densenet"
-
-nome_rede = "densenet"
-tamanho_imagens = 224  # Tamanho das imagens para esta arquitetura (precisa
-                       # ajustar as imagens para este tamanho)
+nome_rede = "resnet"
+tamanho_imagens = 224  # Tamanho das imagens para estas arquiteturas
+                       
 
 
 
@@ -325,10 +324,10 @@ Usando um conjunto de teste próprio que será lido do disco. As imagens são um
 
 # Commented out IPython magic to ensure Python compatibility.
 # Vai baixar o banco de imagens de teste, colocar na pasta data e descompactar
-#!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1Qx-VUrqO0S0OI8CojxVvEkA_JdpocTrE"
-#!mv Fash*.zip ./data/
+!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1Qx-VUrqO0S0OI8CojxVvEkA_JdpocTrE"
+!mv Fash*.zip ./data/
 # %cd ./data/
-#!unzip Fash*.zip
+!unzip Fash*.zip
 # %cd ..
 
 # Classifica uma única imagem 
@@ -415,7 +414,7 @@ matriz = metrics.confusion_matrix(reais,predicoes)
 classes=list(labels_map.values())
 
 # Transforma a matriz no formato da biblioteca PANDA
-df_matriz = pd.DataFrame(matriz/np.sum(matriz) * len(labels_map), index = classes,
+df_matriz = pd.DataFrame(matriz/np.sum(matriz), index = classes,
                      columns = [i for i in classes])
 
 # Gera uma imagem do tipo mapa de calor
