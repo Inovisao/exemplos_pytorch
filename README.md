@@ -20,6 +20,8 @@ Links para o colab de cada arquivo a seguir:
 - [exemplo_pytorch_v5.py](https://colab.research.google.com/drive/1XXegdU79g7HuNvtlSkDzrcbdL67Y-g9q)
 - [exemplo_pytorch_v6.py](https://colab.research.google.com/drive/1YNMPsOhR2PV-DDexVmgo8Fb6mVbTMga6)
 
+- [coisas_bacanas_de_python.py](https://colab.research.google.com/drive/1nET98zFfKdDXXWYofQyPZ-uavYTd0y8Q)
+
 ### Exemplo de uso em máquina local:
 
   Obs: Verifique qual versão do cudatoolkit é compatível com a sua e troque se necessário. Se a máquina não tiver GPU, NÃO tente instalar o cudatoolkit (retire ele do conda create)
