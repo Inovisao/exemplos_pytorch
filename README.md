@@ -9,7 +9,7 @@ códigos para trabalhar com redes neurais profundas.
 
 ### Exemplo de uso no colab:
 
-  Obs: cada versão abaixo tem seu próprio ambiente de exeucução, recomenda-se criar uma cópia no seu drive e executar por ela para poder salvar quaisquer alterações que você julgue necessário.
+  Obs: cada versão abaixo tem seu próprio ambiente de execução, recomenda-se criar uma cópia no seu drive e executar por ela para poder salvar quaisquer alterações que você julgue necessário.
 
 Links para o colab de cada arquivo a seguir:
 
