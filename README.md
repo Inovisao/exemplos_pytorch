@@ -13,14 +13,14 @@ códigos para trabalhar com redes neurais profundas.
 
 Links para o colab de cada arquivo a seguir:
 
-- [exemplo_pytorch_v1.py](https://colab.research.google.com/drive/1sJJgfc_2wLvvZWwhz2Ea8oWUxS9IcORu)
-- [exemplo_pytorch_v2.py](https://colab.research.google.com/drive/1eqZbgFoN2GLNFBreSx1Rp7DmU6b3Di7E)
-- [exemplo_pytorch_v3.py](https://colab.research.google.com/drive/1-GMeHTbbz4MqqUDOMPkd2cLT0rMIBU8k)
-- [exemplo_pytorch_v4.py](https://colab.research.google.com/drive/1egrQOlXvi_rvX2ZtfvK56wVXMyIp6GCh)
-- [exemplo_pytorch_v5.py](https://colab.research.google.com/drive/1XXegdU79g7HuNvtlSkDzrcbdL67Y-g9q)
-- [exemplo_pytorch_v6.py](https://colab.research.google.com/drive/1YNMPsOhR2PV-DDexVmgo8Fb6mVbTMga6)
+- [exemplo_pytorch_v1.py](https://colab.research.google.com/drive/1sJJgfc_2wLvvZWwhz2Ea8oWUxS9IcORu) Classificação com o FashionMNIST
+- [exemplo_pytorch_v2.py](https://colab.research.google.com/drive/1eqZbgFoN2GLNFBreSx1Rp7DmU6b3Di7E) Classificação com o FashionMNIST usando parada antecipada, conjunto de teste nosso, métricas de desempenho e matriz de confusão
+- [exemplo_pytorch_v3.py](https://colab.research.google.com/drive/1-GMeHTbbz4MqqUDOMPkd2cLT0rMIBU8k) Classificação com o FashionMNIST usando redes prontas e transfer learning
+- [exemplo_pytorch_v4.py](https://colab.research.google.com/drive/1egrQOlXvi_rvX2ZtfvK56wVXMyIp6GCh) Classificação com um banco de imagens próprio
+- [exemplo_pytorch_v5.py](https://colab.research.google.com/drive/1XXegdU79g7HuNvtlSkDzrcbdL67Y-g9q) Segmentação semântica 
+- [exemplo_pytorch_v6.py](https://colab.research.google.com/drive/1YNMPsOhR2PV-DDexVmgo8Fb6mVbTMga6) Detecção de objetos
 
-- [coisas_bacanas_de_python.py](https://colab.research.google.com/drive/1nET98zFfKdDXXWYofQyPZ-uavYTd0y8Q)
+- [coisas_bacanas_de_python.py](https://colab.research.google.com/drive/1nET98zFfKdDXXWYofQyPZ-uavYTd0y8Q) Seleção de exemplos de coisas bacanas em python que não existem ou não são tão comuns em linguagens como Java e C
 
 ### Exemplo de uso em máquina local:
 
