@@ -167,7 +167,9 @@ class CustomDataset(Dataset):
             # pode passar da largura ou da altura da imagem. O código
             # abaixo verifica e corrige isso.
             if xmax_final > self.largura: xmax_final = self.largura
-            if ymax_final > self.altura: ymax_final = self.altura                       
+            if ymax_final > self.altura: ymax_final = self.altura
+            if xmin_final < 0: xmin_final = 0
+            if ymin_final < 0: ymin_final = 0                       
           
             # Guarda o retângulo na lista de retângulos
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
