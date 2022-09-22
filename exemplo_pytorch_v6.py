@@ -67,7 +67,8 @@ perc_val = 0.3    # Percentual do treinamento a ser usado para validação
 # Define uma arquitetura já conhecida que será usada
 # Opções atuais: "fasterRCNN"
 nome_rede = "faster"
-tamanho_imagens = 416  # Tamanho das imagem para a arquitetura escolhida
+largura_imagens = 416  # Largura das imagem para a arquitetura escolhida
+altura_imagens = 416  # Altura das imagem para a arquitetura escolhida
 
 # Lista de classes. Tem que colocar sempre a classe fundo.
 classes=['fundo','conde']
@@ -110,7 +111,7 @@ Diferentemente dos exemplos até agora, desta vez iremos criar uma classe para t
 # Cria uma classe para tratar o meu próprio banco de imagens (Custom) tendo
 # como base a classe "Dataset" do pytorch
 class CustomDataset(Dataset):
-    def __init__(self, pasta, nomes_arquivos, altura, largura, classes, transformacoes=None):
+    def __init__(self, pasta, nomes_arquivos, largura, altura, classes, transformacoes=None):
         self.pasta = pasta  # Pasta onde estão as imagens
         self.nomes_arquivos = nomes_arquivos  # Nomes das imagens a serem utilizadas
         self.altura = altura   # Altura que as imagens deverão ter
@@ -140,8 +141,8 @@ class CustomDataset(Dataset):
         root = tree.getroot()
         
         # Altura e Largura original da imagem
-        largura = imagem.shape[1]
         altura = imagem.shape[0]
+        largura = imagem.shape[1]
         
         # Vai ler as coordenadas dos retângulos de anotações e ajustar para
         # o novo tamanho da imagem (usa vários comandos da biblioteca xml.etree
@@ -158,13 +159,15 @@ class CustomDataset(Dataset):
             
             # Redimensiona os retângulos de anotação         
             xmin_final = (xmin/largura)*self.largura
-            xmax_final = (xmax/largura)*self.largura-1 # Gambiarra para não dar
-                       # erro no aumento de dados pois por erro de aproximação
-                       # o valor pode extrapolar o máximo.  
+            xmax_final = (xmax/largura)*self.largura
             ymin_final = (ymin/altura)*self.altura
-            ymax_final = (ymax/altura)*self.altura-1 # Gambiarra para não dar
-                       # erro no aumento de dados pois por erro de aproximação
-                       # o valor pode extrapolar o máximo 
+            ymax_final = (ymax/altura)*self.altura
+
+            # Pelo arredondamento, na hora de converter os retângulos, 
+            # pode passar da largura ou da altura da imagem. O código
+            # abaixo verifica e corrige isso.
+            if xmax_final > self.largura: xmax_final = self.largura
+            if ymax_final > self.altura: ymax_final = self.altura                       
           
             # Guarda o retângulo na lista de retângulos
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
@@ -236,7 +239,7 @@ print('Classes: ',classes,'Total = ',len(classes))
 # usando a classe CustomDataset criada anteriormente
 # Aplica aumento de dados no treinamento com flip, rotação e 3 tipos de suavização
 # Usa uma biblioteca chamada Albumentation para fazer isso (A.)
-treino = CustomDataset(pasta_data,nomes_treino,tamanho_imagens,tamanho_imagens,classes,
+treino = CustomDataset(pasta_data,nomes_treino,largura_imagens,altura_imagens,classes,
                        A.Compose([
                                       A.Flip(0.5),  
 #                                     A.RandomRotate90(0.5),
@@ -249,7 +252,7 @@ treino = CustomDataset(pasta_data,nomes_treino,tamanho_imagens,tamanho_imagens,c
                                       'label_fields': ['labels']
                                  }))
 
-val = CustomDataset(pasta_data,nomes_val,tamanho_imagens,tamanho_imagens,classes,
+val = CustomDataset(pasta_data,nomes_val,largura_imagens,altura_imagens,classes,
                        A.Compose([
                                     ToTensorV2(p=1.0)
                                  ], bbox_params={
@@ -257,7 +260,7 @@ val = CustomDataset(pasta_data,nomes_val,tamanho_imagens,tamanho_imagens,classes
                                       'label_fields': ['labels']
                                  }))
 
-teste = CustomDataset(pasta_data,nomes_teste,tamanho_imagens,tamanho_imagens,classes,
+teste = CustomDataset(pasta_data,nomes_teste,largura_imagens,altura_imagens,classes,
                        A.Compose([
                                     ToTensorV2(p=1.0)
                                  ], bbox_params={
