@@ -27,6 +27,7 @@ Anotações para treinamento, validação e teste:
 - Precisam ter o mesmo nome da imagem correspondente que está na pasta de imagens, mas com extensão .png
 - Precisa ser uma imagem em tons de cinza (1 canal) com o valor de pixel correspondente a cada classe do problema. Por exemplo: 0 = Fundo, 1 = Serpente
 - O código está assumindo apenas duas classes e realiza uma binarização na imagem de anotação
+- Tem um script chamado convertePoligonoPNG, que está na pasta "data" do projeto, que pega anotações de polígonos feitos no Labelme e converte para o formato usado neste exemplos (máscaras em arquivos PNG).
 
 ## Carregando um banco de imagens
 """
