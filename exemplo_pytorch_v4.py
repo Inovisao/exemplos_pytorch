@@ -58,7 +58,7 @@ tamanho_imagens = 224  # Tamanho das imagens para estas arquiteturas
 
 
 # Cria uma função para saber se estamos rodando de dentro de um notebook
-# jupyter 
+# jupyter
 def in_notebook():
     try:
         from IPython import get_ipython
@@ -86,7 +86,7 @@ print("Vai ler as imagens de: ",pasta_data)
 pasta_treino = pasta_data+"train"
 pasta_teste  = pasta_data+"test"
 
-# Define as transformações nas imagens: 
+# Define as transformações nas imagens:
 # Muda tamanho, transforma em tensor e normaliza usando os valores
 # calculados sobre a base ImageNet (por conta da transferência de aprendizagem)
 #
@@ -94,7 +94,7 @@ pasta_teste  = pasta_data+"test"
 transform = transforms.Compose([transforms.Resize((tamanho_imagens,tamanho_imagens)),
                                 transforms.ToTensor(),
                                 #transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-                               ])    
+                               ])
 # Prepara banco de imagens de treino (está junto com validação por enquanto)
 training_val_data = datasets.ImageFolder(root=pasta_treino,transform=transform)
 # Prepara banco de imagens de teste
@@ -111,7 +111,7 @@ val_data = Subset(training_val_data, val_idx)
 train_dataloader = DataLoader(training_data, batch_size=tamanho_lote,shuffle=True)
 val_dataloader = DataLoader(val_data, batch_size=tamanho_lote,shuffle=True)
 
-# Mostra informações do primeiro lote de imagens de validação 
+# Mostra informações do primeiro lote de imagens de validação
 # X vai conter um lote de imagens
 # y vai conter as classes (tipo de vestimenta) de cada imagem do lote
 for X, y in val_dataloader:
@@ -149,7 +149,7 @@ for i in range(1, cols * rows + 1):
     # Tem que ajustar a ordem das dimensões do tensor para que os canais
     # fiquem na última dimensão (e não ma primeira)
     plt.imshow(img.permute(1,2,0))
-    
+
 plt.show() # Este é o comando que vai mostrar as imagens
 
 """## Definindo uma rede neural artificial"""
@@ -165,7 +165,7 @@ total_classes = len(labels_map)
 # Inicia com a rede escolhida (acrescente mais "ifs" para outras redes)
 # Carrega os pesos pré-treinados na ImageNet (transfer learning)
 # Ajusta a última camada para poder corresponder ao total de classes do
-# problema atual. 
+# problema atual.
 if nome_rede == "resnet":
    model = models.resnet18(pretrained=True)
    model.fc = nn.Linear(model.fc.in_features, total_classes )
@@ -176,7 +176,7 @@ elif nome_rede == "squeezenet":
 elif nome_rede == "densenet":
    model = models.densenet161(pretrained=True)
    model.classifier = nn.Linear(model.classifier.in_features,total_classes)
-        
+
 
 # Prepara a rede para o dispositivo que irá processá-la
 model = model.to(device)
@@ -197,7 +197,7 @@ writer = SummaryWriter()
 # dataloader = módulo que manipula o conjunto de imagens
 # model = arquitetura da rede
 # loss_fn = função de perda
-# optimizer = otimizador 
+# optimizer = otimizador
 def train(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)  # Total de imagens
     num_batches = len(dataloader)   # Total de lotes
@@ -214,7 +214,7 @@ def train(dataloader, model, loss_fn, optimizer):
 
         train_loss += loss.item() # Guarda para calcular a perda média
         # Calcula os acertos para o lote inteiro de imagens
-        train_correct += (pred.argmax(1) == y).type(torch.float).sum().item() 
+        train_correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
 
         loss.backward()        # Calcula os gradientes com base no erro (loss)
@@ -222,7 +222,7 @@ def train(dataloader, model, loss_fn, optimizer):
         optimizer.zero_grad()  # Zera os gradientes pois vai acumular para todas
                                # as imagens do lote
 
-        # Imprime informação a cada 4 lotes processados 
+        # Imprime informação a cada 4 lotes processados
         if batch % 4 == 0:
             # Mostra a perda e o total de imagens já processadas
             loss, current = loss.item(), batch * len(X)
@@ -233,7 +233,7 @@ def train(dataloader, model, loss_fn, optimizer):
     train_acuracia = train_correct / size  # Já o total de acertos é em relação
                                            # ao total geral de imagens
 
-    return train_loss, train_acuracia        
+    return train_loss, train_acuracia
 
 # Define a função de validação (aqui a rede não está aprendendo, apenas
 # usando "aquilo que aprendeu", mas em um conjunto de imagens diferente
@@ -242,7 +242,7 @@ def validation(dataloader, model, loss_fn):
     size = len(dataloader.dataset)  # Total de imagens para validação
     num_batches = len(dataloader)   # Total de lotes
     model.eval()  # Coloca a rede em modo de avaliação (e não de aprendizagem)
-    
+
     # Vai calcular a perda e o total de acertos no conjunto de validação
     val_loss, val_correct = 0, 0
 
@@ -261,7 +261,7 @@ def validation(dataloader, model, loss_fn):
     print("Informações na Validação:")
     print(f"Total de acertos: {int(val_correct)}")
     print(f"Total de imagens: {size}")
-    print(f"Perda média: {val_loss:>8f}")            
+    print(f"Perda média: {val_loss:>8f}")
     print(f"Acurácia: {(100*val_acuracia)}%")
     return val_loss, val_acuracia
 
@@ -286,14 +286,14 @@ for epoca in range(epocas):
 
     # Soma uma tolerancia no valor da maior acurácia para que melhoras muito
     # pequenas não sejam consideradas
-    if val_acuracia > (maior_acuracia+tolerancia): 
+    if val_acuracia > (maior_acuracia+tolerancia):
       # Salva a melhor rede encontrada até o momento
       torch.save(model.state_dict(), pasta_data+"modelo_treinado_"+nome_rede+".pth")
-      print("Salvou o modelo com a maior acurácia na validação até agora em "+pasta_data+"modelo_treinado_"+nome_rede+".pth")      
+      print("Salvou o modelo com a maior acurácia na validação até agora em "+pasta_data+"modelo_treinado_"+nome_rede+".pth")
       maior_acuracia = val_acuracia
       total_sem_melhora = 0
-    else: 
-      total_sem_melhora += 1 
+    else:
+      total_sem_melhora += 1
       print(f"Sem melhora há {total_sem_melhora} épocas ({100*val_acuracia}% <= {100*(maior_acuracia+tolerancia)}%)")
     if total_sem_melhora > paciencia:
       print(f"Acabou a paciência com {epoca+1} épocas ")
@@ -302,7 +302,7 @@ for epoca in range(epocas):
 print("Terminou a fase de aprendizagem !")
 
 # Pega algumas imagens para o tensorboard mostrar depois
-images, labels = iter(train_dataloader).next()
+images, labels = next(iter(train_dataloader))
 images = images.to(device)
 labels = labels.to(device)
 # Cria uma grade de imagens para o tensorboard
@@ -326,9 +326,9 @@ writer.close()
 
 model.load_state_dict(torch.load(pasta_data+"modelo_treinado_"+nome_rede+".pth"))
 
-"""## Usando a rede treinada para classificar algumas imagens """
+"""## Usando a rede treinada para classificar algumas imagens"""
 
-# Classifica uma única imagem 
+# Classifica uma única imagem
 # model: rede a ser usada
 # x: imagem
 # y: classificação real da imagem
@@ -365,7 +365,7 @@ for i in range(cols*rows):
     # a dimensão relacionada aos canais (RGB) fiquem por último e não em primeiro
     # fiquem na última dimensão (e não ma primeira)
     plt.imshow(img.cpu().squeeze(0).permute(1,2,0))
-    
+
 plt.show() # Este é o comando que vai mostrar as imagens
 
 """## Gera matriz de confusão e algumas métricas de avaliação"""
@@ -393,10 +393,10 @@ test_acuracia = test_correct/len(test_data)
 # Constroi a matriz de confusão
 matriz = metrics.confusion_matrix(reais,predicoes)
 
-# Pega a lista de classes 
+# Pega a lista de classes
 classes=list(labels_map.values())
 
-# Normaliza a matriz para o intervalo 0 e 1 e arredonda em 2 casas decimais 
+# Normaliza a matriz para o intervalo 0 e 1 e arredonda em 2 casas decimais
 # cada célula
 matriz_normalizada = np.round(matriz/np.sum(matriz),2)
 # Transforma a matriz no formato da biblioteca PANDA
