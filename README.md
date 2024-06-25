@@ -33,7 +33,9 @@ Abrir em um navegador este link aqui: http://localhost:6006/
 - Copie e cole o conteúdo de algum dos exemplos para dentro do notebook
 - Siga as orientações de dentro do código (pode ser necessário transformar alguns trechos de código)
 
-* Link direto para o exemplo das coisas bacanas em python no colab:[clique aqui](https://colab.research.google.com/drive/1mwdCGpZTomGO3VnKVaHkORwDY0o5yygJ?usp=sharing)
+### Coisas Bacanas em Python
+
+- Link direto para o exemplo das coisas bacanas em python no colab:[CLIQUE AQUI](https://colab.research.google.com/drive/1mwdCGpZTomGO3VnKVaHkORwDY0o5yygJ?usp=sharing)
   
 
 
