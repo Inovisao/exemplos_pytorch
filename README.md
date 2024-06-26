@@ -31,7 +31,8 @@ Abrir em um navegador este link aqui: http://localhost:6006/
 - Crie uma conta no [Google colab](https://colab.research.google.com/)
 - Dentro do Colab crie um novo notebook jupyter
 - Copie e cole o conteúdo de algum dos exemplos para dentro do notebook
-- Siga as orientações de dentro do código. Note que o código foi gerado a partir de um notebook jupyter e tem algumas coisas documentadas que podem ter que ser "descomentadas".
+- Siga as orientações de dentro do código. Note que o código foi gerado a partir de um notebook jupyter e tem algumas coisas documentadas que podem ter que ser "descomentadas"
+- Pode ser interessante quebrar o código em várias caixas diferentes no colab para poder fazer experimentos com pequenos trechos
 
 ### Coisas Bacanas em Python
 
