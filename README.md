@@ -28,10 +28,10 @@ Abrir em um navegador este link aqui: http://localhost:6006/
 
 ### Dicas de uso no colab:
 
-- Crie uma conta no colab usando sua conta no google (gmail)
-- Crie um novo notebook
+- Crie uma conta no [Google colab](https://colab.research.google.com/)
+- Dentro do Colab crie um novo notebook jupyter
 - Copie e cole o conteúdo de algum dos exemplos para dentro do notebook
-- Siga as orientações de dentro do código (pode ser necessário transformar alguns trechos de código)
+- Siga as orientações de dentro do código. Note que o código foi gerado a partir de um notebook jupyter e tem algumas coisas documentadas que podem ter que ser "descomentadas".
 
 ### Coisas Bacanas em Python
 
