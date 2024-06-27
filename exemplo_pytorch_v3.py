@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """exemplo_pytorch_v3.ipynb
 
-SE FOR USAR NO COLAB PROCURE NO CÓDIGO PELA PALAVRA "COMENTÁRIOS" E SIGA AS INSTRUÇÕES
-
 ## Tutorial Introdutório de Pytorch (v3)
 
 Mudanças nesta versão:
@@ -319,15 +317,12 @@ model.load_state_dict(torch.load("modelo_treinado.pth"))
 Usando um conjunto de teste próprio que será lido do disco. As imagens são um pouco diferentes do conjunto usado para treinamento da rede e por isso e desempenho cai bastante. 
 """
 
-# É PRECISO RETIRAR OS COMENTÁRIOS ABAIXO SE FOR RODAR NO COLAB
-
 # Vai baixar o banco de imagens de teste, colocar na pasta data e descompactar
-#!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1kH4JxSPkqSwsrWOQd40xYiAnhziK6_iq"
-
-#!mv Fash*.zip ./data/
-#%cd ./data/
-#!unzip Fash*.zip
-#%cd ..
+!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1kH4JxSPkqSwsrWOQd40xYiAnhziK6_iq"
+!mv Fash*.zip ./data/
+%cd ./data/
+!unzip Fash*.zip
+%cd ..
 
 
 
