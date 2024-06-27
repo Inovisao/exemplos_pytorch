@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+SE FOR USAR NO COLAB PROCURE NO CÓDIGO PELA PALAVRA "COMENTÁRIOS" E SIGA AS INSTRUÇÕES
+
 ## Tutorial Introdutório de Pytorch (v2)
 Traduzido e adaptado do site oficial do python: https://pytorch.org/tutorials/beginner/basics/quickstart_tutorial.html por Hemerson Pistori (pistori@ucdb.br)
 
@@ -12,6 +14,8 @@ Mudanças desta versão:
 - Mostrar matriz de confusão
 
 ## Carregando um banco de imagens
+
+
 """
 
 import torch   # Biblioteca pytorch principal
@@ -318,10 +322,10 @@ Usando um conjunto de teste próprio que será lido do disco. As imagens são um
 # Vai baixar o banco de imagens de teste, colocar na pasta data e descompactar
 #!curl -L -o FashionMNIST_custom_testset.zip "https://drive.google.com/uc?export=download&id=1kH4JxSPkqSwsrWOQd40xYiAnhziK6_iq"
 
-# !mv Fash*.zip ./data/
-# %cd ./data/
+#!mv Fash*.zip ./data/
+#%cd ./data/
 #!unzip Fash*.zip
-# %cd ..
+#%cd ..
 
 
 
