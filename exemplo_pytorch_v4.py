@@ -8,9 +8,7 @@ Mudanças nesta versão:
 - Lendo os dados de uma pasta no google drive, separados entre treino (train) e teste (test). Dentro de cada pasta (train,teste) as imagens devem estar separadas em subpastas, uma para cada classe.
 - Separa percentual para validação
 - Mostra grafo da rede e lote de imagens no tensorboard
-- Testa se está rodando em um notebook jupyter antes de
-  realizar operação que só funcionam no notebook (facilita
-  para rodar tanto no notebook quanto em um desktop)
+
 
 ### Carregando um banco de imagens
 Usa como exemplo imagens disponíveis na pasta 'data' deste projeto aqui: http://git.inovisao.ucdb.br/inovisao/exemplos_pytorch
@@ -308,9 +306,9 @@ writer.close()
 
 """
 
-# Commented out IPython magic to ensure Python compatibility.
-# %load_ext tensorboard
-# %tensorboard --logdir=runs
+##Retirar os comentários se quiser usar o tensorboard
+#%load_ext tensorboard
+#%tensorboard --logdir=runs
 
 """## Carregando a rede treinada anteriormente e usando
 

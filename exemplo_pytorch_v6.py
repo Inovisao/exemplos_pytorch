@@ -499,9 +499,9 @@ writer.close()
 
 """
 
-# Commented out IPython magic to ensure Python compatibility.
-# %load_ext tensorboard
-# %tensorboard --logdir=runs
+##Retirar os comentários se quiser usar o tensorboard
+#%load_ext tensorboard
+#%tensorboard --logdir=runs
 
 """## Carregando a rede treinada anteriormente e usando
 
