@@ -73,31 +73,28 @@ altura_imagens = 416  # Altura das imagem para a arquitetura escolhida
 # Lista de classes. Tem que colocar sempre a classe fundo.
 classes=['fundo','conde']
 
-# Cria uma função para saber se estamos rodando de dentro de um notebook
-# jupyter 
-def in_notebook():
-    try:
-        from IPython import get_ipython
-        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
-            return False
-    except ImportError:
-        return False
-    except AttributeError:
-        return False
-    return True
-
-
-# Liga o Colab à sua conta no Drive
-if in_notebook():
-   from google.colab import drive
-   drive.mount('/content/drive')
-
-# Ajusta nome das pastas onde estão todas as imagens e anotações
-# Neste exemplo usei um banco nosso de imagens obtidas por drone da cobertura
-# de prédios onde os equipamentos do tipo condensador foram anotados.
-if in_notebook(): pasta_data = "/content/drive/MyDrive/data/condensadores/"
-else: pasta_data = "./data/condensadores/"  
+# Pasta onde estão os dados para treinamento e teste
+pasta_data = "./data/condensadores/"  
 print("Vai ler as imagens de: ",pasta_data)
+
+# Se for usar seu próprio Drive descomente e ajuste a linha abaixo
+#pasta_data = "/content/drive/MyDrive/data/condensadores/"
+
+
+# Descomente o código abaixo se quiser montar e usar o seu próprio google drive
+# no lugar das pastas que o colab cria automaticamente 
+# from google.colab import drive
+# drive.mount('/content/drive')
+
+# Vai baixar o banco de imagens de treino e de teste do exemplo com serpentes
+!curl -L -o v6_condensadores.zip "https://drive.google.com/uc?export=download&id=1UY4906H7PsB7KXFG-v1ADupSQXJXxQK7"   
+!mkdir ./data/
+!mv v6*.zip ./data/
+%cd ./data/
+!unzip v6*.zip
+%cd ..
+
+
 
 # Verifica se tem GPU na máquina, caso contrário, usa a CPU mesmo
 device = "cuda" if torch.cuda.is_available() else "cpu"

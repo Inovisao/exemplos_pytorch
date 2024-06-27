@@ -15,11 +15,11 @@ Principais funcionalidades:
 
 Imagens para treinamento, validação e teste:
 
-- Precisam estar dentro de uma pasta no seu drive chamada compara_segmentadores/data/imagens/
+- Precisam estar dentro de uma pasta no seu drive chamada data/imagens/
 
 Anotações para treinamento, validação e teste:
 
-- Precisam estar dentro de uma pasta no seu drive chamada compara_segmentadores/data/anotacoes/
+- Precisam estar dentro de uma pasta no seu drive chamada data/anotacoes/
 - Precisam ter o mesmo nome da imagem correspondente que está na pasta de imagens, mas com extensão .png
 - Precisa ser uma imagem em tons de cinza (1 canal) com o valor de pixel correspondente a cada classe do problema. Por exemplo: 0 = Fundo, 1 = Serpente
 - O código está assumindo apenas duas classes e realiza uma binarização na imagem de anotação
@@ -67,28 +67,26 @@ tamanho_imagens = 500  # Tamanho das imagem para a arquitetura escolhida
 # Lista de classes 
 classes=['fundo','cascavel']
 
-# Cria uma função para saber se estamos rodando de dentro de um notebook
-# jupyter 
-def in_notebook():
-    try:
-        from IPython import get_ipython
-        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
-            return False
-    except ImportError:
-        return False
-    except AttributeError:
-        return False
-    return True
+# Descomente o código abaixo se quiser montar e usar o seu próprio google drive
+# no lugar das pastas que o colab cria automaticamente 
+# from google.colab import drive
+# drive.mount('/content/drive')
 
+# Vai baixar o banco de imagens de treino e de teste do exemplo com serpentes
+!curl -L -o v5_imagens_anotacoes.zip "https://drive.google.com/uc?export=download&id=1B1IqZ4oHWH_-CRpRVG1MExjziBn2SMOC"
+!mkdir ./data/
+!mv v5*.zip ./data/
+%cd ./data/
+!unzip v5*.zip
+%cd ..
 
-# Liga o Colab à sua conta no Drive
-if in_notebook():
-   from google.colab import drive
-   drive.mount('/content/drive')
 
 # Ajusta nome das pastas onde estão todas as imagens e anotações
-if in_notebook(): pasta_data = "/content/drive/MyDrive/compara_segmentadores/data/"
-else: pasta_data = "./data/"  
+pasta_data = "./data/"  
+
+# Se estive usando seu próprio drive, descomente e ajuste a linha abaixo
+#pasta_data = "/content/drive/MyDrive/data/"
+
 print("Vai ler as imagens de: ",pasta_data)
 
 # Define as transformações nas imagens: 
