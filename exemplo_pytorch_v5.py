@@ -397,7 +397,7 @@ figure = plt.figure(figsize=(12, 8))  # Cria o local para mostrar as imagens
 plt.axis("off")
 cols, rows = 4, 4  # Irá mostrar imagens com suas anotações em uma grade 4x2
 
-# Carrega um lote de imagens e de anotações de treino
+# Carrega um lote de imagens e de anotações de teste
 X,y = LoteDeImagens(pasta_data,nomes_teste,tamanho_lote)
 
 # Passa por cada imagem do lote
